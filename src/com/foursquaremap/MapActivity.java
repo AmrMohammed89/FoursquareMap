@@ -67,15 +67,16 @@ public class MapActivity extends FragmentActivity implements
 	private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9002;
 	private static final float DEFAULTZOOM = 15;
 	private static RestAdapter RESTADAPTER;
+	static Marker MARKER;
 
-	LatLng LL;
-	LatLng LLTest;
+	LatLng lL;
+	LatLng llCurrent;
 
 	String accessToken;
 	GoogleMap mMap;
 	LocationClient mLocationClient;
 	LocationManager locationManager;
-	Marker MARKER;
+
 
 	GPSTracker gps;
 
@@ -101,8 +102,8 @@ public class MapActivity extends FragmentActivity implements
 	public void onEventMainThread(OnSuccess success) {
 		reo = success;
 		mMap.clear();
-		LLTest = MARKER.getPosition();
-		setMarker(LLTest.latitude, LLTest.longitude);
+		llCurrent = MARKER.getPosition();
+		setMarker(llCurrent.latitude, llCurrent.longitude);
 
 		for (int i = 0; i < success.getSuccess().venues.size(); i++) {
 			try {
@@ -319,9 +320,9 @@ public class MapActivity extends FragmentActivity implements
 			Toast.makeText(this, "Current location isn't available",
 					Toast.LENGTH_SHORT).show();
 		} else {
-			LL = new LatLng(currentLocation.getLatitude(),
+			lL = new LatLng(currentLocation.getLatitude(),
 					currentLocation.getLongitude());
-			CameraUpdate update = CameraUpdateFactory.newLatLngZoom(LL,
+			CameraUpdate update = CameraUpdateFactory.newLatLngZoom(lL,
 					DEFAULTZOOM);
 			mMap.animateCamera(update);
 
