@@ -24,6 +24,8 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
@@ -65,13 +67,15 @@ public class MapActivity extends FragmentActivity implements
 	private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9002;
 	private static final float DEFAULTZOOM = 15;
 	private static RestAdapter RESTADAPTER;
-	static LatLng LL;
+
+	LatLng LL;
+	LatLng LLTest;
 
 	String accessToken;
 	GoogleMap mMap;
-	static LocationClient mLocationClient;
+	LocationClient mLocationClient;
 	LocationManager locationManager;
-	static Marker MARKER;
+	Marker MARKER;
 
 	GPSTracker gps;
 
@@ -97,13 +101,8 @@ public class MapActivity extends FragmentActivity implements
 	public void onEventMainThread(OnSuccess success) {
 		reo = success;
 		mMap.clear();
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, this);
-
-		Location locationNet = locationManager
-				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		setMarker(locationNet.getLatitude(), locationNet.getLongitude());
+		LLTest = MARKER.getPosition();
+		setMarker(LLTest.latitude, LLTest.longitude);
 
 		for (int i = 0; i < success.getSuccess().venues.size(); i++) {
 			try {
@@ -133,10 +132,16 @@ public class MapActivity extends FragmentActivity implements
 		context = this;
 		if (servicesOK()) {
 			setContentView(R.layout.activity_map);
-
 			if (initMap()) {
-				mLocationClient = new LocationClient(this, this, this);
-				mLocationClient.connect();
+				gps = new GPSTracker(this);
+
+				if (gps.canGetLocation()) {
+
+					mLocationClient = new LocationClient(this, this, this);
+					mLocationClient.connect();
+				} else {
+					gps.showSettingsAlert();
+				}
 
 			} else {
 				Toast.makeText(this, "Map not available!", Toast.LENGTH_SHORT)
@@ -196,7 +201,7 @@ public class MapActivity extends FragmentActivity implements
 							@Override
 							public void success(FoursquareAddCheckIn arg0,
 									Response arg1) {
-								Toast.makeText(context, "check_in success",
+								Toast.makeText(context, "Check in success !",
 										Toast.LENGTH_LONG).show();
 
 							}
@@ -236,6 +241,10 @@ public class MapActivity extends FragmentActivity implements
 
 	@SuppressLint("NewApi")
 	private boolean initMap() {
+		if (!checkConnection()) {
+			Toast.makeText(this, "Check internet connection !",
+					Toast.LENGTH_SHORT).show();
+		}
 		if (mMap == null) {
 			SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.map);
@@ -397,6 +406,18 @@ public class MapActivity extends FragmentActivity implements
 				new LatLng(lat, lng)).icon(
 				BitmapDescriptorFactory.defaultMarker());
 		MARKER = mMap.addMarker(options);
+
+	}
+
+	private boolean checkConnection() {
+
+		final ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
+		if (!(activeNetwork != null && activeNetwork.isConnected())) {
+			return false;
+		} else {
+			return true;
+		}
 
 	}
 
