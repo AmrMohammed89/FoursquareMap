@@ -63,8 +63,6 @@ public class MapActivity extends FragmentActivity implements
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
 
 	private static final int GPS_ERRORDIALOG_REQUEST = 9001;
-	@SuppressWarnings("unused")
-	private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9002;
 	private static final float DEFAULTZOOM = 15;
 	private static RestAdapter RESTADAPTER;
 	static Marker MARKER;
