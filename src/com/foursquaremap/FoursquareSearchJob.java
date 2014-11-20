@@ -37,7 +37,7 @@ public class FoursquareSearchJob extends Job {
 	Context context;
 	Bitmap b;
 	private static RestAdapter restAdapter;
-	String strFilter1, strFilter2, strFilter3;
+	String saveCatID;
 
 	public FoursquareSearchJob(String ll, String oauth_token, String date,
 			String radius, Context con, int PRIORITY) {
@@ -74,23 +74,19 @@ public class FoursquareSearchJob extends Job {
 				for (int i = 0; i < re.response.venues.size(); i++) {
 					try {
 
+						saveCatID = re.response.venues.get(i).categories.get(0).id;
+
 						re.response.venues.get(i).bitmap = DownloadBMP(re.response.venues
 								.get(i).categories.get(0).icon.prefix
 								+ "bg_64"
 								+ re.response.venues.get(i).categories.get(0).icon.suffix);
-
-						strFilter1 = re.response.venues.get(i).categories
-								.get(0).icon.prefix;
-						strFilter2 = strFilter1.replaceAll(
-								"https://ss3.4sqi.net/img/categories_v2/", "");
-						strFilter3 = strFilter2.replaceAll("/", "_");
 
 						downloadFile(
 								re.response.venues.get(i).categories.get(0).icon.prefix
 										+ "bg_64"
 										+ re.response.venues.get(i).categories
 												.get(0).icon.suffix,
-								strFilter3);
+								saveCatID);
 
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -158,7 +154,7 @@ public class FoursquareSearchJob extends Job {
 			direct.mkdirs();
 		}
 		File file = new File(Environment.getExternalStorageDirectory()
-				+ "/TestFoursquare" + "/" + fileName+".png");
+				+ "/TestFoursquare" + "/" + fileName + ".png");
 		if (!file.exists()) {
 
 			DownloadManager mgr = (DownloadManager) context
@@ -172,11 +168,10 @@ public class FoursquareSearchJob extends Job {
 					DownloadManager.Request.NETWORK_WIFI
 							| DownloadManager.Request.NETWORK_MOBILE)
 					.setAllowedOverRoaming(false)
-					.setTitle("Download images")
-					.setDescription("get venues images")
+					.setTitle("Downloading")
+					.setDescription("Download venues images")
 					.setDestinationInExternalPublicDir("/TestFoursquare",
 							fileName + ".png");
-			// "fileName.png"
 
 			mgr.enqueue(request);
 		}
