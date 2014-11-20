@@ -1,5 +1,6 @@
 package com.foursquaremap;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,12 +22,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.widget.Toast;
@@ -75,7 +78,6 @@ public class MapActivity extends FragmentActivity implements
 	LocationClient mLocationClient;
 	LocationManager locationManager;
 
-
 	GPSTracker gps;
 
 	response response;
@@ -91,6 +93,9 @@ public class MapActivity extends FragmentActivity implements
 	Context context;
 
 	public OnSuccess reo;
+
+	String strFilter1, strFilter2, strFilter3;
+	Bitmap btmImageSdCard;
 
 	public void onEventMainThread(OnError error) {
 		Toast.makeText(context, "check the network please", Toast.LENGTH_LONG)
@@ -254,6 +259,12 @@ public class MapActivity extends FragmentActivity implements
 				response = gson.fromJson(saved, response.class);
 				for (int i = 0; i < response.venues.size(); i++) {
 					try {
+						strFilter1 = response.venues.get(i).categories
+								.get(0).icon.prefix;
+						strFilter2 = strFilter1.replaceAll(
+								"https://ss3.4sqi.net/img/categories_v2/", "");
+						strFilter3 = strFilter2.replaceAll("/", "_");
+						btmImageSdCard = getImage(strFilter3);
 						mMap.addMarker(new MarkerOptions()
 								.position(
 										new LatLng(
@@ -265,7 +276,7 @@ public class MapActivity extends FragmentActivity implements
 										response.venues.get(i).categories
 												.get(0).name)
 								.icon(BitmapDescriptorFactory
-										.fromResource(R.drawable.ic_mapmarker)));
+										.fromBitmap(btmImageSdCard)));
 
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -429,6 +440,13 @@ public class MapActivity extends FragmentActivity implements
 			startActivity(intent);
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	public Bitmap getImage(String fileName) {
+		File f = new File(Environment.getExternalStorageDirectory()
+				+ "/TestFoursquare" + "/" + fileName + ".png");
+		Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+		return bmp;
 	}
 
 }
