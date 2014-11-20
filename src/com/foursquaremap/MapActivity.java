@@ -94,8 +94,9 @@ public class MapActivity extends FragmentActivity implements
 
 	public OnSuccess reo;
 
-	String strFilter1, strFilter2, strFilter3;
 	Bitmap btmImageSdCard;
+
+	String getCatID;
 
 	public void onEventMainThread(OnError error) {
 		Toast.makeText(context, "check the network please", Toast.LENGTH_LONG)
@@ -259,12 +260,8 @@ public class MapActivity extends FragmentActivity implements
 				response = gson.fromJson(saved, response.class);
 				for (int i = 0; i < response.venues.size(); i++) {
 					try {
-						strFilter1 = response.venues.get(i).categories
-								.get(0).icon.prefix;
-						strFilter2 = strFilter1.replaceAll(
-								"https://ss3.4sqi.net/img/categories_v2/", "");
-						strFilter3 = strFilter2.replaceAll("/", "_");
-						btmImageSdCard = getImage(strFilter3);
+						getCatID = response.venues.get(i).categories.get(0).id;
+						btmImageSdCard = getImage(getCatID);
 						mMap.addMarker(new MarkerOptions()
 								.position(
 										new LatLng(
