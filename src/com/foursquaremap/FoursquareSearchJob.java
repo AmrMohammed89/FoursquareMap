@@ -172,8 +172,8 @@ public class FoursquareSearchJob extends Job {
 					DownloadManager.Request.NETWORK_WIFI
 							| DownloadManager.Request.NETWORK_MOBILE)
 					.setAllowedOverRoaming(false)
-					.setTitle("Demo")
-					.setDescription("Something useful. No, really.")
+					.setTitle("Download images")
+					.setDescription("get venues images")
 					.setDestinationInExternalPublicDir("/TestFoursquare",
 							fileName + ".png");
 			// "fileName.png"
