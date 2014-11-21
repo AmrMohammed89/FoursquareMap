@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import retrofit.RestAdapter;
@@ -29,6 +28,7 @@ import com.path.android.jobqueue.Params;
 
 import de.greenrobot.event.EventBus;
 
+@SuppressLint("NewApi")
 public class FoursquareSearchJob extends Job {
 	String ll, oauth_token, date, radius;
 	URL location;
@@ -76,11 +76,6 @@ public class FoursquareSearchJob extends Job {
 
 						saveCatID = re.response.venues.get(i).categories.get(0).id;
 
-						re.response.venues.get(i).bitmap = DownloadBMP(re.response.venues
-								.get(i).categories.get(0).icon.prefix
-								+ "bg_64"
-								+ re.response.venues.get(i).categories.get(0).icon.suffix);
-
 						downloadFile(
 								re.response.venues.get(i).categories.get(0).icon.prefix
 										+ "bg_64"
@@ -105,19 +100,6 @@ public class FoursquareSearchJob extends Job {
 			Toast.makeText(context, e.getResponse().getStatus(),
 					Toast.LENGTH_LONG).show();
 		}
-	}
-
-	private Bitmap DownloadBMP(String url) {
-		// create a URL object using the passed string
-		try {
-			returnedBMP = BitmapFactory.decodeStream((InputStream) new URL(url
-					.toString()).getContent());
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return returnedBMP;
 	}
 
 	@Override
@@ -145,7 +127,6 @@ public class FoursquareSearchJob extends Job {
 
 	}
 
-	@SuppressLint("NewApi")
 	public void downloadFile(String uRl, String fileName) {
 		File direct = new File(Environment.getExternalStorageDirectory()
 				+ "/TestFoursquare");
