@@ -111,6 +111,8 @@ public class MapActivity extends FragmentActivity implements
 
 		for (int i = 0; i < success.getSuccess().venues.size(); i++) {
 			try {
+				getCatID = success.getSuccess().venues.get(i).categories.get(0).id;
+				btmImageSdCard = getImage(getCatID);
 				mMap.addMarker(new MarkerOptions()
 						.position(
 								new LatLng(
@@ -121,8 +123,8 @@ public class MapActivity extends FragmentActivity implements
 						.snippet(
 								success.getSuccess().venues.get(i).categories
 										.get(0).name)
-						.icon(BitmapDescriptorFactory.fromBitmap(success
-								.getSuccess().venues.get(i).bitmap)));
+										.icon(BitmapDescriptorFactory
+												.fromBitmap(btmImageSdCard)));
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -181,36 +183,42 @@ public class MapActivity extends FragmentActivity implements
 
 			@Override
 			public void onInfoWindowClick(Marker marker) {
-				CheckInData = new HashMap<String, String>();
-				CheckInData.put("oauth_token",
-						prefs.getString("accessToken", ""));
+				if (checkConnection()) {
+					CheckInData = new HashMap<String, String>();
+					CheckInData.put("oauth_token",
+							prefs.getString("accessToken", ""));
 
-				CheckInData.put(
-						"venueId",
-						getVenueId(marker.getPosition().latitude,
-								marker.getPosition().longitude));
-				CheckInData.put("v",
-						timeMilisToString(System.currentTimeMillis()));
-				CheckInData.put("broadcast", "public");
-				AddCheck_in retrofitAddUser = RESTADAPTER
-						.create(AddCheck_in.class);
-				retrofitAddUser.AddCheck_in(CheckInData,
-						new Callback<FoursquareAddCheckIn>() {
+					CheckInData.put(
+							"venueId",
+							getVenueId(marker.getPosition().latitude,
+									marker.getPosition().longitude));
+					CheckInData.put("v",
+							timeMilisToString(System.currentTimeMillis()));
+					CheckInData.put("broadcast", "public");
+					AddCheck_in retrofitAddUser = RESTADAPTER
+							.create(AddCheck_in.class);
+					retrofitAddUser.AddCheck_in(CheckInData,
+							new Callback<FoursquareAddCheckIn>() {
 
-							@Override
-							public void failure(RetrofitError arg0) {
-								Toast.makeText(context, arg0.getMessage(),
-										Toast.LENGTH_LONG).show();
-							}
+								@Override
+								public void failure(RetrofitError arg0) {
+									Toast.makeText(context, arg0.getMessage(),
+											Toast.LENGTH_LONG).show();
+								}
 
-							@Override
-							public void success(FoursquareAddCheckIn arg0,
-									Response arg1) {
-								Toast.makeText(context, "Check in success !",
-										Toast.LENGTH_LONG).show();
+								@Override
+								public void success(FoursquareAddCheckIn arg0,
+										Response arg1) {
+									Toast.makeText(context,
+											"Check in success !",
+											Toast.LENGTH_LONG).show();
 
-							}
-						});
+								}
+							});
+				} else {
+					Toast.makeText(context, "check the connection ",
+							Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 
